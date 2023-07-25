@@ -1,51 +1,30 @@
+const urlBackend = "https://alopez022-scaling-space-goggles-qjv6w6656x4fx474-3001.preview.app.github.dev/api";
+					
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
-				}
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
+			userSignup: (user) => {
+				console.log("User received: " + JSON.stringify(user));
+				return fetch(urlBackend + "/user/signup", {
+					body: JSON.stringify(user),
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+				.then(response => {
+					if(!response.ok) {
+						return "Something was wrong";
+					} else {
+						return response.json();
+					}
+				})
+				.catch(error => {
+					console.log("Error during user signup: " + error);
+					throw new Error("Unexpected error");
 				});
-
-				//reset the global store
-				setStore({ demo: demo });
 			}
 		}
 	};
